@@ -34,9 +34,17 @@ app.register_blueprint(auth_bp)
 @app.route("/")
 def home():
     
-    if not session :
-        return render_template("base.html")
-    return render_template("base.html",username=session["username"])
+    projects = [
+        {
+            "name": "Linear Salary Predictor",
+            "model": "Simple Linear Regressor",
+            "description": "An ML project using K-Means.",
+            "img": "images/products/salary_pred_linear.jpeg"
+        }
+    ]
+    username=session.get("username")
+    
+    return render_template("Projects.html",username=username ,project=projects)
 
 
 @app.route("/insert", methods=["POST"])
@@ -91,27 +99,38 @@ def add_user():
         flash("Registration failed. Username may already exist.", "danger")
         return redirect(url_for("auth.reg"))
     
-@app.route("/login",methods=["GET" , "POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    
+
     if request.method == "POST":
-            username=request.form.get("username")
-            password=request.form.get("password")
-            query=db.select(User).filter_by(username=username)
-            user=db.one_or_404(query,description="user not found!!")
-            
-            if not check_password_hash(user.password,password):
-                flash("Username or Password is incorrect!!","danger")
-                return redirect(url_for("auth.log"))
-            
-            session["id"]=user.id
-            session["username"]=user.username
-            session["email"]=user.email
-            return render_template("base.html",username=session["username"])
-    
-    print(session)
-    
-    return redirect(url_for('auth.log'))
+
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        user = db.session.execute(
+            db.select(User).filter_by(username=username)
+        ).scalar_one_or_none()
+
+        # Check whether user exists
+        if user is None:
+            flash("Username or password is incorrect!", "danger")
+            return redirect(url_for("auth.log"))
+
+        # Check password
+        if not check_password_hash(user.password, password):
+            flash("Username or password is incorrect!", "danger")
+            return redirect(url_for("auth.log"))
+
+        # Store user details in session
+        session.clear()
+        session["id"] = user.id
+        session["username"] = user.username
+        session["email"] = user.email
+
+        flash("Login successful!", "success")
+        return redirect(url_for("home"))
+
+    return redirect(url_for("auth.log"))
 
 @app.route("/logout")
 def logout():
@@ -120,13 +139,12 @@ def logout():
 
 @app.errorhandler(404)
 def page_not_found(error):
-    flash(f" not found!! \n {error}","danger")
-    return redirect(url_for('log')),404
+    return render_template("404.html"), 404
 
 @app.errorhandler(500)
 def server_issue(error):
     flash(f" server issue!! \n {error}","danger")
-    return redirect(url_for('log')),404
+    return redirect(url_for('home')),500
 
 if __name__ == "__main__":
     
