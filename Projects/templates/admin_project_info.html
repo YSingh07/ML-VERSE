@@ -1,0 +1,241 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="min-h-screen bg-[#080B14] px-4 py-12 text-white">
+    <div class="max-w-5xl mx-auto">
+
+        <!-- Heading -->
+        <div class="mb-10">
+            <p class="text-blue-400 text-sm uppercase tracking-[3px] font-semibold">
+                ML-VERSE ADMIN
+            </p>
+
+            <h1 class="text-3xl md:text-4xl font-bold mt-2">
+                {% if wiki %}
+                    Edit Wiki Article
+                {% else %}
+                    Create ML Wiki
+                {% endif %}
+            </h1>
+
+            <p class="text-gray-400 mt-2">
+                Document machine learning knowledge, algorithms and projects.
+            </p>
+        </div>
+
+        <form method="POST"
+              action="{% if wiki %}{{ url_for('project_page_wiki_edit', wiki_id=wiki.id) }}{% else %}{{ url_for('project_page.wiki_add') }}{% endif %}"
+              class="space-y-8">
+
+            <!-- BASIC INFORMATION -->
+            <div class="bg-[#111827] border border-white/10 rounded-2xl p-6 md:p-8">
+                <h2 class="text-xl font-semibold mb-6 text-blue-400">
+                    Basic Information
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Title *</label>
+                        <input type="text" name="title"
+                               value="{{ wiki.title if wiki else '' }}"
+                               placeholder="e.g. Random Forest"
+                               required
+                               class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Slug *</label>
+                        <input type="text" name="slug"
+                               value="{{ wiki.slug if wiki else '' }}"
+                               placeholder="random-forest"
+                               required
+                               class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Image Path</label>
+                        <input type="text" name="image_path"
+                               value="{{ wiki.image_path if wiki else '' }}"
+                               placeholder="uploads/random_forest.png"
+                               class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Model / Algorithm</label>
+                        <input type="text" name="model"
+                               value="{{ wiki.model if wiki else '' }}"
+                               placeholder="Random Forest Classifier"
+                               class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm text-gray-300 mb-2">Short Description</label>
+                        <textarea name="short_description" rows="3"
+                                  placeholder="Brief introduction to this ML topic..."
+                                  class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-blue-500">{{ wiki.short_description if wiki else '' }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Status</label>
+                        <select name="status"
+                                class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                            <option value="DRAFT" {% if wiki and wiki.status == 'DRAFT' %}selected{% endif %}>Draft</option>
+                            <option value="PUBLISHED" {% if wiki and wiki.status == 'PUBLISHED' %}selected{% endif %}>Published</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- KNOWLEDGE -->
+            <div class="bg-[#111827] border border-white/10 rounded-2xl p-6 md:p-8">
+                <h2 class="text-xl font-semibold mb-6 text-purple-400">
+                    ML Knowledge
+                </h2>
+
+                <div class="space-y-6">
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">About</label>
+                        <textarea name="about" rows="8"
+                                  placeholder="Explain this algorithm or project in detail..."
+                                  class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-purple-500">{{ wiki.about if wiki else '' }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">How It Works</label>
+                        <textarea name="working" rows="8"
+                                  placeholder="Explain the working step by step..."
+                                  class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-purple-500">{{ wiki.working if wiki else '' }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Model Details</label>
+                        <textarea name="model_details" rows="8"
+                                  placeholder="Theory, mathematical concepts, architecture, parameters..."
+                                  class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-purple-500">{{ wiki.model_details if wiki else '' }}</textarea>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- TRAINING -->
+            <div class="bg-[#111827] border border-white/10 rounded-2xl p-6 md:p-8">
+                <h2 class="text-xl font-semibold mb-6 text-emerald-400">
+                    Training & Evaluation
+                </h2>
+
+                <div class="space-y-6">
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Preprocessing</label>
+                        <textarea name="preprocessing" rows="6"
+                                  placeholder="Missing value handling, encoding, scaling, feature selection..."
+                                  class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-emerald-500">{{ wiki.preprocessing if wiki else '' }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Training</label>
+                        <textarea name="training" rows="8"
+                                  placeholder="Training process, hyperparameters, model fitting..."
+                                  class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-emerald-500">{{ wiki.training if wiki else '' }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Evaluation</label>
+                        <textarea name="evaluation" rows="8"
+                                  placeholder="Accuracy, precision, recall, F1 score, results, limitations..."
+                                  class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-emerald-500">{{ wiki.evaluation if wiki else '' }}</textarea>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- RESOURCES -->
+            <div class="bg-[#111827] border border-white/10 rounded-2xl p-6 md:p-8">
+                <h2 class="text-xl font-semibold mb-6 text-yellow-400">
+                    Resources & Implementation
+                </h2>
+
+                <div class="space-y-6">
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Dataset</label>
+                        <textarea name="dataset" rows="5"
+                                  placeholder="Dataset name, source, features, target column..."
+                                  class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-yellow-500">{{ wiki.dataset if wiki else '' }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Requirements</label>
+                        <textarea name="requirements" rows="5"
+                                  placeholder="Python libraries, versions, system requirements..."
+                                  class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-yellow-500">{{ wiki.requirements if wiki else '' }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Usage / Instructions</label>
+                        <textarea name="usage" rows="8"
+                                  placeholder="How to run the project, use the model, API instructions..."
+                                  class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-yellow-500">{{ wiki.usage if wiki else '' }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">PKL File Path</label>
+                        <input type="text" name="pkl_file"
+                               value="{{ wiki.pkl_file if wiki else '' }}"
+                               placeholder="models/random_forest.pkl"
+                               class="w-full bg-[#0B0F19] border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-yellow-500">
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- TIMESTAMPS (READ ONLY) -->
+            {% if wiki %}
+            <div class="bg-[#111827] border border-white/10 rounded-2xl p-6">
+                <h2 class="text-lg font-semibold mb-4 text-gray-300">
+                    Article History
+                </h2>
+
+                <p class="text-sm text-gray-400">
+                    Created: {{ wiki.created_at }}
+                </p>
+
+                <p class="text-sm text-gray-400 mt-2">
+                    Last Updated: {{ wiki.last_updated }}
+                </p>
+            </div>
+            {% endif %}
+
+
+            <!-- ACTIONS -->
+            <div class="flex flex-col sm:flex-row gap-4">
+
+                <button type="submit"
+                        class="flex-1 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-semibold transition">
+                    {% if wiki %}Update Article{% else %}Create Article{% endif %}
+                </button>
+
+                <a href="{{ url_for('project_page.wiki_list') }}"
+                   class="flex-1 text-center py-3 rounded-xl border border-gray-700 hover:bg-white/5 transition">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
+
+

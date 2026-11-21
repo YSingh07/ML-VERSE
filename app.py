@@ -1,10 +1,16 @@
 from flask import Flask , render_template , request,flash,redirect,url_for,jsonify,session
-from Auth.Auth_route import auth_bp
+
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
 from werkzeug.security import generate_password_hash , check_password_hash
 
+from Auth.Auth_route import auth_bp
+from Projects.project_routes import project_bp
+
+from model.project_db import MLWiki
+from model.user_db import User
+from database.database import db
 
 app= Flask(__name__)
 
@@ -16,37 +22,24 @@ print(os.getenv("app_secret_key"))
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('con_string')
 
-db=SQLAlchemy(app)
+db.init_app(app)
 
-#-----------------MODEL---------#
 
-class User(db.Model):
-    __tablename__ = "user"
-    id = db.Column(db.Integer,primary_key=True)
-    username = db.Column(db.String(100),unique=True,nullable=False)
-    email = db.Column(db.String(100),nullable=False)
-    password = db.Column(db.String(255),nullable=False)
+
+
 
 
 #------------------routes-----------#
 app.register_blueprint(auth_bp)
 
+app.register_blueprint(project_bp)
+
 @app.route("/")
 def home():
     
-    projects = [
-        {
-            "name": "Linear Salary Predictor",
-            "model": "Simple Linear Regressor",
-            "description": "An ML project using K-Means.",
-            "img": "images/products/salary_pred_linear.jpeg"
-        }
-    ]
-    username=session.get("username")
-    
-    return render_template("Projects.html",username=username ,project=projects)
+    return redirect(url_for("project_page.wiki_list"))
 
-
+#----------register_route------------------
 @app.route("/insert", methods=["POST"])
 def add_user():
 
@@ -54,6 +47,7 @@ def add_user():
     email = request.form.get("email")
     password = request.form.get("password")
     confirm_password = request.form.get("confirm_password")
+    role = request.form.get("role")
 
     # Validate username
     if not username:
@@ -82,7 +76,8 @@ def add_user():
     user = User(
         username=username,
         email=email,
-        password=hashed_password
+        password=hashed_password,
+        role=role
     )
 
     try:
@@ -98,6 +93,8 @@ def add_user():
 
         flash("Registration failed. Username may already exist.", "danger")
         return redirect(url_for("auth.reg"))
+    
+#------------login---------------------------
     
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -126,26 +123,34 @@ def login():
         session["id"] = user.id
         session["username"] = user.username
         session["email"] = user.email
+        session["role"] = user.role
 
         flash("Login successful!", "success")
         return redirect(url_for("home"))
 
     return redirect(url_for("auth.log"))
 
+#------------------logout----------------
+
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for('home'))
 
+#---------------not_found---------------
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template("404.html"), 404
 
+#----------------server_error-------------
 @app.errorhandler(500)
 def server_issue(error):
     flash(f" server issue!! \n {error}","danger")
     return redirect(url_for('home')),500
 
+
+#--------------run_app--------------------
 if __name__ == "__main__":
     
     with app.app_context():

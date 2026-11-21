@@ -1,59 +1,87 @@
-<nav class="w-full bg-[#0B0D12] border-b border-gray-800 px-8 py-4">
 
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
+<nav class="w-full bg-[#080B14]/95 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 py-4">
+
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
 
         <!-- Logo -->
-        <div class="text-2xl font-bold text-white">
+        <a href="{{ url_for('home') }}" class="text-2xl font-bold tracking-tight text-white whitespace-nowrap">
             ML-<span class="text-blue-500">VERSE</span>
-        </div>
+        </a>
 
         <!-- Navigation Links -->
-        <div class="hidden md:flex items-center gap-8 text-gray-300">
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
 
-            <a href="/" class="hover:text-blue-400 transition">
+            <a href="/" class="hover:text-blue-400 transition duration-300">
                 Home
             </a>
 
-            <a href="/about" class="hover:text-blue-400 transition">
+            <a href="/about" class="hover:text-blue-400 transition duration-300">
                 About
             </a>
 
-            <a href="/services" class="hover:text-blue-400 transition">
+            <a href="/services" class="hover:text-blue-400 transition duration-300">
                 Services
             </a>
 
-            <a href="/contact" class="hover:text-blue-400 transition">
+            <a href="/contact" class="hover:text-blue-400 transition duration-300">
                 Contact
             </a>
 
         </div>
-        {% if username %}
 
-            <div style="color: blueviolet; font-size:30px; font-weight: bold;  font-style: italic; font-family:cursive;">
-                Hello {{username}} !
-            </div>
+        <!-- User Section -->
+        <div class="flex items-center gap-3">
 
-            <div>
-                <a href="{{ url_for('logout') }}"
-                class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition">
-                    Login out
+            {% if username %}
+
+                <!-- Welcome Message -->
+                <div class="hidden sm:block text-sm text-gray-400" style="font-size: medium;">
+                    Welcome,
+                    <span class=" font-bold" style="color:#D530FF; font-size: large;">{{ username }}</span>
+                </div>
+
+                <!-- Admin Button -->
+                {% if role == 'ADMIN' %}
+                    <a
+                        href="{{ url_for('auth.reg') }}"
+                        class="px-4 py-2 rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:border-indigo-400 transition duration-300 text-sm font-medium whitespace-nowrap"
+                        style="color: aliceblue; background-color: blueviolet;"
+                    >
+                        + Add User
+                    </a>
+
+                    <a
+                        href="{{ url_for('project_page.admin_project_info') }}"
+                        class="px-4 py-2 rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:border-indigo-400 transition duration-300 text-sm font-medium whitespace-nowrap"
+                        style="color: aliceblue; background-color: blueviolet;"
+                    >
+                        + Add Project
+                    </a>
+                {% endif %}
+
+                <!-- Logout Button -->
+                <a
+                    href="{{ url_for('logout') }}"
+                    class="px-4 py-2 rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:border-indigo-400 transition duration-300 text-sm font-medium whitespace-nowrap"
+                    style="color: aliceblue; background-color: blueviolet;"
+                >
+                    Logout
                 </a>
-            </div>
 
-        {% else %}
-            
-            <div>
-                <a href="{{ url_for('auth.log') }}"
-                class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition">
+            {% else %}
+
+                <!-- Login Button -->
+                <a
+                    href="{{ url_for('auth.log') }}"
+                    class="px-4 py-2 rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:border-indigo-400 transition duration-300 text-sm font-medium whitespace-nowrap"
+                    style="color: aliceblue; background-color: blueviolet;"    
+                >
                     Login
                 </a>
-            </div>
-        
-        {% endif %}
-        
 
-        <!-- Login Button -->
-            
+            {% endif %}
+
+        </div>
 
     </div>
 
